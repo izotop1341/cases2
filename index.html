@@ -20,7 +20,7 @@
         .currency {
             position: absolute;
             top: 20px;
-            right: 20px; /* Перемещено вправо */
+            right: 20px;
             font-size: 1.5em;
             background-color: #2a3b5b;
             padding: 8px 15px;
@@ -31,45 +31,93 @@
             gap: 8px;
         }
         .currency img {
-            width: 20px; /* Уменьшенный размер иконки звезды */
+            width: 20px;
             height: 20px;
         }
         h1 {
             font-size: 2.5em;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             color: #00aaff;
             text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
         }
-        ul {
-            list-style: none;
-            padding: 0;
+        .menu, .game-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
             width: 90%;
-            max-width: 300px;
+            max-width: 600px;
         }
-        li {
+        .menu-item, .chest {
             background-color: #2a3b5b;
-            padding: 10px; /* Уменьшено для компактности */
-            margin: 10px 0;
+            padding: 10px;
             border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s ease;
             border: 1px solid #00aaff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100px;
+            text-align: center;
         }
-        li:hover {
+        .menu-item:hover, .chest:hover {
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
-            cursor: pointer;
         }
-        li img {
-            width: 64px; /* Уменьшенный размер картинок */
+        .menu-item img, .chest img {
+            width: 64px;
             height: 64px;
             border-radius: 8px;
             animation: pulse 2s infinite ease-in-out;
+        }
+        .chest.open {
+            animation: openChest 0.5s ease-in-out;
+        }
+        .chest.winner {
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 20px #ffd700;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
+        }
+        @keyframes openChest {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .message {
+            font-size: 1.2em;
+            margin-top: 20px;
+            text-align: center;
+            color: #ff4d4d;
+        }
+        .message.winner {
+            color: #ffd700;
+        }
+        .play-again, .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #00aaff;
+            color: #1a2236;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .play-again:hover, .back-button:hover {
+            background-color: #007bff;
+            transform: scale(1.05);
+        }
+        .play-again {
+            display: none;
+        }
+        .game-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .hidden {
+            display: none;
         }
         @media (max-width: 600px) {
             h1 {
@@ -79,12 +127,19 @@
                 font-size: 1.2em;
                 padding: 6px 12px;
             }
-            li {
-                padding: 8px;
+            .menu-item, .chest {
+                width: 80px;
             }
-            li img {
-                width: 48px; /* Ещё меньше для мобильных */
+            .menu-item img, .chest img {
+                width: 48px;
                 height: 48px;
+            }
+            .message {
+                font-size: 1em;
+            }
+            .play-again, .back-button {
+                font-size: 1em;
+                padding: 8px 16px;
             }
         }
     </style>
@@ -92,13 +147,98 @@
 <body>
     <div class="currency">
         <img src="https://img.icons8.com/emoji/24/star-emoji.png" alt="Звёздочка">
-        <span>1000</span> <!-- Убрано слово "Звёздочек" -->
+        <span id="balance">1000</span>
     </div>
-    <h1>Добро пожаловать!</h1>
-    <ul>
-        <li><img src="https://img.icons8.com/color/64/treasure-chest.png" alt="Сундуки"></li>
-        <li><img src="https://img.icons8.com/color/64/slot-machine.png" alt="Слоты"></li>
-        <li><img src="https://img.icons8.com/color/64/roulette.png" alt="Рулетка"></li>
-    </ul>
+    <h1 id="welcome">Добро пожаловать!</h1>
+    <div class="menu" id="menu">
+        <div class="menu-item" onclick="startGame('chests')">
+            <img src="https://img.icons8.com/color/64/treasure-chest.png" alt="Сундуки">
+        </div>
+        <div class="menu-item">
+            <img src="https://img.icons8.com/color/64/slot-machine.png" alt="Слоты">
+        </div>
+        <div class="menu-item">
+            <img src="https://img.icons8.com/color/64/roulette.png" alt="Рулетка">
+        </div>
+    </div>
+    <div class="game-container hidden" id="chestsGame">
+        <div class="chest" onclick="openChest(0)">
+            <img src="https://img.icons8.com/color/64/treasure-chest.png" alt="Сундук 1">
+        </div>
+        <div class="chest" onclick="openChest(1)">
+            <img src="https://img.icons8.com/color/64/treasure-chest.png" alt="Сундук 2">
+        </div>
+        <div class="chest" onclick="openChest(2)">
+            <img src="https://img.icons8.com/color/64/treasure-chest.png" alt="Сундук 3">
+        </div>
+    </div>
+    <div class="message" id="message"></div>
+    <div class="game-buttons">
+        <button class="play-again" id="playAgain" onclick="resetGame()">Играть снова</button>
+        <button class="back-button hidden" id="backButton" onclick="backToMenu()">Назад</button>
+    </div>
+    <script>
+        let balance = 1000;
+        let gameActive = true;
+        let winningChest = Math.floor(Math.random() * 3);
+
+        function startGame(game) {
+            if (game === 'chests') {
+                document.getElementById('menu').classList.add('hidden');
+                document.getElementById('chestsGame').classList.remove('hidden');
+                document.getElementById('welcome').classList.add('hidden');
+                document.getElementById('backButton').classList.remove('hidden');
+            }
+        }
+
+        function openChest(index) {
+            if (!gameActive) return;
+            gameActive = false;
+            const chests = document.querySelectorAll('.chest');
+            const message = document.getElementById('message');
+            const playAgainButton = document.getElementById('playAgain');
+
+            chests.forEach((chest, i) => {
+                chest.classList.add('open');
+                if (i === index) {
+                    if (i === winningChest) {
+                        balance += 100;
+                        document.getElementById('balance').textContent = balance;
+                        message.textContent = 'Поздравляем! Ты выиграл 100 звёздочек!';
+                        message.classList.add('winner');
+                        chest.classList.add('winner');
+                    } else {
+                        message.textContent = 'Тебе не повезло, попробуй ещё раз';
+                    }
+                }
+            });
+
+            playAgainButton.style.display = 'block';
+        }
+
+        function resetGame() {
+            gameActive = true;
+            winningChest = Math.floor(Math.random() * 3);
+            const chests = document.querySelectorAll('.chest');
+            const message = document.getElementById('message');
+            const playAgainButton = document.getElementById('playAgain');
+
+            chests.forEach(chest => {
+                chest.classList.remove('open', 'winner');
+            });
+            message.textContent = '';
+            message.classList.remove('winner');
+            playAgainButton.style.display = 'none';
+            // Экран игры остаётся активным
+        }
+
+        function backToMenu() {
+            document.getElementById('chestsGame').classList.add('hidden');
+            document.getElementById('menu').classList.remove('hidden');
+            document.getElementById('welcome').classList.remove('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            resetGame();
+        }
+    </script>
 </body>
 </html>
