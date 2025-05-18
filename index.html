@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #1a2236; /* Тёмно-синий фон, как у 1win */
-            color: #ffffff; /* Белый текст для контраста */
+            background-color: #1a2236;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -17,10 +17,27 @@
             margin: 0;
             overflow: hidden;
         }
+        .currency {
+            position: absolute;
+            top: 20px;
+            right: 20px; /* Перемещено вправо */
+            font-size: 1.5em;
+            background-color: #2a3b5b;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #00aaff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .currency img {
+            width: 20px; /* Уменьшенный размер иконки звезды */
+            height: 20px;
+        }
         h1 {
             font-size: 2.5em;
             margin-bottom: 30px;
-            color: #00aaff; /* Яркий голубой акцент, как в дизайне 1win */
+            color: #00aaff;
             text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
         }
         ul {
@@ -30,39 +47,58 @@
             max-width: 300px;
         }
         li {
-            background-color: #2a3b5b; /* Тёмный фон для элементов списка */
-            padding: 15px;
+            background-color: #2a3b5b;
+            padding: 10px; /* Уменьшено для компактности */
             margin: 10px 0;
             border-radius: 10px;
-            font-size: 1.3em;
             text-align: center;
             transition: all 0.3s ease;
-            border: 1px solid #00aaff; /* Голубая обводка */
+            border: 1px solid #00aaff;
         }
         li:hover {
-            background-color: #00aaff; /* Голубой фон при наведении */
-            color: #1a2236; /* Тёмный текст при наведении */
             transform: scale(1.05);
-            cursor: pointer;
             box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
+            cursor: pointer;
+        }
+        li img {
+            width: 64px; /* Уменьшенный размер картинок */
+            height: 64px;
+            border-radius: 8px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         @media (max-width: 600px) {
             h1 {
                 font-size: 2em;
             }
+            .currency {
+                font-size: 1.2em;
+                padding: 6px 12px;
+            }
             li {
-                font-size: 1.1em;
-                padding: 12px;
+                padding: 8px;
+            }
+            li img {
+                width: 48px; /* Ещё меньше для мобильных */
+                height: 48px;
             }
         }
     </style>
 </head>
 <body>
+    <div class="currency">
+        <img src="https://img.icons8.com/emoji/24/star-emoji.png" alt="Звёздочка">
+        <span>1000</span> <!-- Убрано слово "Звёздочек" -->
+    </div>
     <h1>Добро пожаловать!</h1>
     <ul>
-        <li>Сундуки</li>
-        <li>Слоты</li>
-        <li>Рулетка</li>
+        <li><img src="https://img.icons8.com/color/64/treasure-chest.png" alt="Сундуки"></li>
+        <li><img src="https://img.icons8.com/color/64/slot-machine.png" alt="Слоты"></li>
+        <li><img src="https://img.icons8.com/color/64/roulette.png" alt="Рулетка"></li>
     </ul>
 </body>
 </html>
