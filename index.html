@@ -6,38 +6,54 @@
     <title>Игровой бот</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1a2236; /* Тёмно-синий фон, как у 1win */
+            color: #ffffff; /* Белый текст для контраста */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            color: #333;
+            overflow: hidden;
         }
         h1 {
-            font-size: 2em;
-            margin-bottom: 20px;
-            color: #007bff;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #00aaff; /* Яркий голубой акцент, как в дизайне 1win */
+            text-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
         }
         ul {
             list-style: none;
             padding: 0;
+            width: 90%;
+            max-width: 300px;
         }
         li {
-            background-color: #fff;
+            background-color: #2a3b5b; /* Тёмный фон для элементов списка */
             padding: 15px;
             margin: 10px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            font-size: 1.2em;
-            width: 200px;
+            border-radius: 10px;
+            font-size: 1.3em;
             text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #00aaff; /* Голубая обводка */
         }
         li:hover {
-            background-color: #e0e0e0;
+            background-color: #00aaff; /* Голубой фон при наведении */
+            color: #1a2236; /* Тёмный текст при наведении */
+            transform: scale(1.05);
             cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            li {
+                font-size: 1.1em;
+                padding: 12px;
+            }
         }
     </style>
 </head>
