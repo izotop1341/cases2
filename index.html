@@ -17,10 +17,15 @@
             margin: 0;
             overflow: hidden;
         }
-        .currency {
+        .top-bar {
             position: absolute;
             top: 20px;
             right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .currency {
             font-size: 1.5em;
             background-color: #2a3b5b;
             padding: 8px 15px;
@@ -33,6 +38,20 @@
         .currency img {
             width: 20px;
             height: 20px;
+        }
+        .inventory-button {
+            font-size: 1.2em;
+            background-color: #00aaff;
+            color: #1a2236;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .inventory-button:hover {
+            background-color: #007bff;
+            transform: scale(1.05);
         }
         h1 {
             font-size: 2.5em;
@@ -87,9 +106,16 @@
             width: 200px;
             height: 200px;
             background: conic-gradient(
-                #ffd700 0deg 120deg,
-                #ff4d4d 120deg 240deg,
-                #00aaff 240deg 360deg
+                #ffd700 0deg 36deg,     /* 10 звёзд */
+                #ffcc00 36deg 72deg,    /* 20 звёзд */
+                #00ffcc 72deg 108deg,   /* Бриллиант */
+                #ff4d4d 108deg 144deg,  /* Кот в мешке */
+                #ffaa00 144deg 180deg,  /* Золотой слиток */
+                #990000 180deg 216deg,  /* Банкротство */
+                #8b4513 216deg 252deg,  /* Полено */
+                #666666 252deg 288deg,  /* Автомат */
+                #ff69b4 288deg 324deg,  /* Попи Плей Тайм */
+                #4b0082 324deg 360deg   /* Сова */
             );
             border-radius: 50%;
             border: 2px solid #00aaff;
@@ -103,9 +129,9 @@
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 20px solid #ffffff;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 30px solid #ffffff;
             z-index: 10;
         }
         .roulette-wheel.spin {
@@ -121,14 +147,23 @@
         }
         .roulette-label {
             position: absolute;
-            font-size: 1em;
-            color: #1a2236;
-            font-weight: bold;
-            text-align: center;
+            width: 32px;
+            height: 32px;
         }
-        .roulette-label:nth-child(1) { transform: rotate(60deg) translateY(-80px); }
-        .roulette-label:nth-child(2) { transform: rotate(180deg) translateY(-80px); }
-        .roulette-label:nth-child(3) { transform: rotate(300deg) translateY(-80px); }
+        .roulette-label img {
+            width: 100%;
+            height: 100%;
+        }
+        .roulette-label:nth-child(1) { transform: rotate(18deg) translateY(-80px); }  /* 10 звёзд */
+        .roulette-label:nth-child(2) { transform: rotate(54deg) translateY(-80px); }  /* 20 звёзд */
+        .roulette-label:nth-child(3) { transform: rotate(90deg) translateY(-80px); }  /* Бриллиант */
+        .roulette-label:nth-child(4) { transform: rotate(126deg) translateY(-80px); } /* Кот в мешке */
+        .roulette-label:nth-child(5) { transform: rotate(162deg) translateY(-80px); } /* Золотой слиток */
+        .roulette-label:nth-child(6) { transform: rotate(198deg) translateY(-80px); } /* Банкротство */
+        .roulette-label:nth-child(7) { transform: rotate(234deg) translateY(-80px); } /* Полено */
+        .roulette-label:nth-child(8) { transform: rotate(270deg) translateY(-80px); } /* Автомат */
+        .roulette-label:nth-child(9) { transform: rotate(306deg) translateY(-80px); } /* Попи Плей Тайм */
+        .roulette-label:nth-child(10) { transform: rotate(342deg) translateY(-80px); } /* Сова */
         .slots-container {
             display: flex;
             flex-direction: column;
@@ -158,6 +193,55 @@
         }
         .reel.spin {
             animation: slotSpin 1s ease-in-out;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background-color: #2a3b5b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #00aaff;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #00aaff;
+        }
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .inventory-table th, .inventory-table td {
+            border: 1px solid #00aaff;
+            padding: 8px;
+            text-align: center;
+        }
+        .inventory-table th {
+            background-color: #00aaff;
+            color: #1a2236;
+        }
+        .inventory-table img {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -216,7 +300,11 @@
             h1 {
                 font-size: 2em;
             }
-            .currency {
+            .top-bar {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .currency, .inventory-button {
                 font-size: 1.2em;
                 padding: 6px 12px;
             }
@@ -233,16 +321,24 @@
             }
             .roulette-pointer {
                 top: 0;
-                border-left: 8px solid transparent;
-                border-right: 8px solid transparent;
-                border-top: 15px solid #ffffff;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 20px solid #ffffff;
             }
             .roulette-label {
-                font-size: 0.8em;
+                width: 24px;
+                height: 24px;
             }
-            .roulette-label:nth-child(1) { transform: rotate(60deg) translateY(-60px); }
-            .roulette-label:nth-child(2) { transform: rotate(180deg) translateY(-60px); }
-            .roulette-label:nth-child(3) { transform: rotate(300deg) translateY(-60px); }
+            .roulette-label:nth-child(1) { transform: rotate(18deg) translateY(-60px); }
+            .roulette-label:nth-child(2) { transform: rotate(54deg) translateY(-60px); }
+            .roulette-label:nth-child(3) { transform: rotate(90deg) translateY(-60px); }
+            .roulette-label:nth-child(4) { transform: rotate(126deg) translateY(-60px); }
+            .roulette-label:nth-child(5) { transform: rotate(162deg) translateY(-60px); }
+            .roulette-label:nth-child(6) { transform: rotate(198deg) translateY(-60px); }
+            .roulette-label:nth-child(7) { transform: rotate(234deg) translateY(-60px); }
+            .roulette-label:nth-child(8) { transform: rotate(270deg) translateY(-60px); }
+            .roulette-label:nth-child(9) { transform: rotate(306deg) translateY(-60px); }
+            .roulette-label:nth-child(10) { transform: rotate(342deg) translateY(-60px); }
             .reel {
                 width: 60px;
                 height: 60px;
@@ -258,13 +354,26 @@
                 font-size: 1em;
                 padding: 8px 16px;
             }
+            .modal-content {
+                padding: 15px;
+            }
+            .inventory-table th, .inventory-table td {
+                padding: 5px;
+            }
+            .inventory-table img {
+                width: 20px;
+                height: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="currency">
-        <img src="https://img.icons8.com/emoji/24/star-emoji.png" alt="Звёздочка">
-        <span id="balance">1000</span>
+    <div class="top-bar">
+        <div class="currency">
+            <img src="https://img.icons8.com/emoji/24/star-emoji.png" alt="Звёздочка">
+            <span id="balance">1000</span>
+        </div>
+        <button class="inventory-button" onclick="openInventory()">Инвентарь</button>
     </div>
     <h1 id="welcome">Добро пожаловать!</h1>
     <div class="menu" id="menu">
@@ -293,9 +402,36 @@
         <div class="roulette-pointer"></div>
         <div class="roulette-wheel" id="wheel">
             <div class="roulette-labels">
-                <div class="roulette-label">100</div>
-                <div class="roulette-label">Пусто</div>
-                <div class="roulette-label">50</div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/star--v1.png" alt="10 звёзд">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/star--v1.png" alt="20 звёзд">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/diamond.png" alt="Бриллиант">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/sack.png" alt="Кот в мешке">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/gold-bars.png" alt="Золотой слиток">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/bankruptcy.png" alt="Банкротство">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/wood.png" alt="Полено">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/automatic.png" alt="Автомат">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/huggy-wuggy.png" alt="Попи Плей Тайм">
+                </div>
+                <div class="roulette-label">
+                    <img src="https://img.icons8.com/color/32/owl.png" alt="Сова">
+                </div>
             </div>
         </div>
         <button class="spin-button" id="spinButton" onclick="spinRoulette()">Крутить</button>
@@ -319,21 +455,44 @@
         <button class="play-again" id="playAgain" onclick="resetGame()">Играть снова</button>
         <button class="back-button hidden" id="backButton" onclick="backToMenu()">Назад</button>
     </div>
+    <div class="modal" id="inventoryModal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeInventory()">&times;</span>
+            <h2>Инвентарь</h2>
+            <table class="inventory-table" id="inventoryTable">
+                <thead>
+                    <tr>
+                        <th>Приз</th>
+                        <th>Количество</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryBody"></tbody>
+            </table>
+        </div>
+    </div>
     <script>
         let balance = 1000;
         let gameActive = true;
         let winningChest = Math.floor(Math.random() * 3);
         let currentGame = '';
-        const roulettePrizes = [
-            { name: '100 звёздочек', value: 100 },
-            { name: 'Пусто', value: 0 },
-            { name: '50 звёздочек', value: 50 }
-        ];
         const slotSymbols = [
             { name: 'Звезда', icon: 'https://img.icons8.com/color/64/star--v1.png' },
             { name: 'Монета', icon: 'https://img.icons8.com/color/64/coins.png' },
             { name: 'Алмаз', icon: 'https://img.icons8.com/color/64/diamond.png' }
         ];
+        const roulettePrizes = [
+            { name: '10 звёзд', value: 10, icon: 'https://img.icons8.com/color/24/star--v1.png', addToInventory: true },
+            { name: '20 звёзд', value: 20, icon: 'https://img.icons8.com/color/24/star--v1.png', addToInventory: true },
+            { name: 'Бриллиант', value: 0, icon: 'https://img.icons8.com/color/24/diamond.png', addToInventory: true },
+            { name: 'Кот в мешке', value: 0, icon: 'https://img.icons8.com/color/24/sack.png', addToInventory: false },
+            { name: 'Золотой слиток', value: 0, icon: 'https://img.icons8.com/color/24/gold-bars.png', addToInventory: true },
+            { name: 'Банкротство', value: -1000, icon: 'https://img.icons8.com/color/24/bankruptcy.png', addToInventory: false },
+            { name: 'Полено', value: 0, icon: 'https://img.icons8.com/color/24/wood.png', addToInventory: true },
+            { name: 'Автомат', value: 0, icon: 'https://img.icons8.com/color/24/automatic.png', addToInventory: true },
+            { name: 'Игрушка Попи Плей Тайм', value: 0, icon: 'https://img.icons8.com/color/24/huggy-wuggy.png', addToInventory: true },
+            { name: 'Сова', value: 0, icon: 'https://img.icons8.com/color/24/owl.png', addToInventory: true }
+        ];
+        let inventory = {};
 
         function startGame(game) {
             document.getElementById('menu').classList.add('hidden');
@@ -393,13 +552,22 @@
 
             setTimeout(() => {
                 wheel.classList.remove('spin');
-                if (prize.value > 0) {
-                    balance += prize.value;
+                if (prize.name === 'Банкротство') {
+                    balance = Math.max(0, balance + prize.value);
                     document.getElementById('balance').textContent = balance;
+                    message.textContent = 'Мистер Бист запрещает вам депать, в качестве штрафа он заберёт у вас 1000 звёзд';
+                } else if (prize.name === 'Кот в мешке') {
+                    message.textContent = 'Тебе не повезло, попробуй ещё раз';
+                } else {
+                    if (prize.value > 0) {
+                        balance += prize.value;
+                        document.getElementById('balance').textContent = balance;
+                    }
+                    if (prize.addToInventory) {
+                        inventory[prize.name] = (inventory[prize.name] || 0) + 1;
+                    }
                     message.textContent = `Поздравляем! Ты выиграл ${prize.name}!`;
                     message.classList.add('winner');
-                } else {
-                    message.textContent = 'Тебе не повезло, попробуй ещё раз';
                 }
                 spinButton.disabled = false;
                 playAgainButton.style.display = 'block';
@@ -488,6 +656,28 @@
             document.getElementById('backButton').classList.add('hidden');
             currentGame = '';
             resetGame();
+        }
+
+        function openInventory() {
+            const modal = document.getElementById('inventoryModal');
+            const inventoryBody = document.getElementById('inventoryBody');
+            inventoryBody.innerHTML = '';
+            for (const [item, count] of Object.entries(inventory)) {
+                const prize = roulettePrizes.find(p => p.name === item);
+                if (prize) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><img src="${prize.icon}" alt="${item}"> ${item}</td>
+                        <td>${count}</td>
+                    `;
+                    inventoryBody.appendChild(row);
+                }
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeInventory() {
+            document.getElementById('inventoryModal').style.display = 'none';
         }
     </script>
 </body>
