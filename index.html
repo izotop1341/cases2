@@ -99,71 +99,14 @@
             flex-direction: column;
             align-items: center;
             width: 90%;
-            max-width: 300px;
+            max-width: 350px;
             position: relative;
         }
-        .roulette-wheel {
-            width: 200px;
-            height: 200px;
-            background: conic-gradient(
-                #ffd700 0deg 36deg,     /* 10 звёзд */
-                #ffcc00 36deg 72deg,    /* 20 звёзд */
-                #00ffcc 72deg 108deg,   /* Бриллиант */
-                #ff4d4d 108deg 144deg,  /* Кот в мешке */
-                #ffaa00 144deg 180deg,  /* Золотой слиток */
-                #990000 180deg 216deg,  /* Банкротство */
-                #8b4513 216deg 252deg,  /* Полено */
-                #666666 252deg 288deg,  /* Автомат */
-                #ff69b4 288deg 324deg,  /* Попи Плей Тайм */
-                #4b0082 324deg 360deg   /* Сова */
-            );
-            border-radius: 50%;
+        .roulette-canvas {
             border: 2px solid #00aaff;
-            position: relative;
-            transition: transform 3s ease-out;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 170, 255, 0.5);
         }
-        .roulette-pointer {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 30px solid #ffffff;
-            z-index: 10;
-        }
-        .roulette-wheel.spin {
-            animation: spin 3s ease-out;
-        }
-        .roulette-labels {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .roulette-label {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-        }
-        .roulette-label img {
-            width: 100%;
-            height: 100%;
-        }
-        .roulette-label:nth-child(1) { transform: rotate(18deg) translateY(-80px); }  /* 10 звёзд */
-        .roulette-label:nth-child(2) { transform: rotate(54deg) translateY(-80px); }  /* 20 звёзд */
-        .roulette-label:nth-child(3) { transform: rotate(90deg) translateY(-80px); }  /* Бриллиант */
-        .roulette-label:nth-child(4) { transform: rotate(126deg) translateY(-80px); } /* Кот в мешке */
-        .roulette-label:nth-child(5) { transform: rotate(162deg) translateY(-80px); } /* Золотой слиток */
-        .roulette-label:nth-child(6) { transform: rotate(198deg) translateY(-80px); } /* Банкротство */
-        .roulette-label:nth-child(7) { transform: rotate(234deg) translateY(-80px); } /* Полено */
-        .roulette-label:nth-child(8) { transform: rotate(270deg) translateY(-80px); } /* Автомат */
-        .roulette-label:nth-child(9) { transform: rotate(306deg) translateY(-80px); } /* Попи Плей Тайм */
-        .roulette-label:nth-child(10) { transform: rotate(342deg) translateY(-80px); } /* Сова */
         .slots-container {
             display: flex;
             flex-direction: column;
@@ -253,10 +196,6 @@
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(1080deg); }
-        }
         @keyframes slotSpin {
             0% { transform: translateY(0); }
             50% { transform: translateY(-100px); }
@@ -315,30 +254,10 @@
                 width: 48px;
                 height: 48px;
             }
-            .roulette-wheel {
-                width: 150px;
-                height: 150px;
+            .roulette-canvas {
+                width: 200px !important;
+                height: 200px !important;
             }
-            .roulette-pointer {
-                top: 0;
-                border-left: 4px solid transparent;
-                border-right: 4px solid transparent;
-                border-top: 20px solid #ffffff;
-            }
-            .roulette-label {
-                width: 24px;
-                height: 24px;
-            }
-            .roulette-label:nth-child(1) { transform: rotate(18deg) translateY(-60px); }
-            .roulette-label:nth-child(2) { transform: rotate(54deg) translateY(-60px); }
-            .roulette-label:nth-child(3) { transform: rotate(90deg) translateY(-60px); }
-            .roulette-label:nth-child(4) { transform: rotate(126deg) translateY(-60px); }
-            .roulette-label:nth-child(5) { transform: rotate(162deg) translateY(-60px); }
-            .roulette-label:nth-child(6) { transform: rotate(198deg) translateY(-60px); }
-            .roulette-label:nth-child(7) { transform: rotate(234deg) translateY(-60px); }
-            .roulette-label:nth-child(8) { transform: rotate(270deg) translateY(-60px); }
-            .roulette-label:nth-child(9) { transform: rotate(306deg) translateY(-60px); }
-            .roulette-label:nth-child(10) { transform: rotate(342deg) translateY(-60px); }
             .reel {
                 width: 60px;
                 height: 60px;
@@ -399,41 +318,7 @@
         </div>
     </div>
     <div class="roulette-container hidden" id="rouletteGame">
-        <div class="roulette-pointer"></div>
-        <div class="roulette-wheel" id="wheel">
-            <div class="roulette-labels">
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/star--v1.png" alt="10 звёзд">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/star--v1.png" alt="20 звёзд">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/diamond.png" alt="Бриллиант">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/sack.png" alt="Кот в мешке">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/gold-bars.png" alt="Золотой слиток">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/bankruptcy.png" alt="Банкротство">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/wood.png" alt="Полено">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/automatic.png" alt="Автомат">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/huggy-wuggy.png" alt="Попи Плей Тайм">
-                </div>
-                <div class="roulette-label">
-                    <img src="https://img.icons8.com/color/32/owl.png" alt="Сова">
-                </div>
-            </div>
-        </div>
+        <canvas id="rouletteCanvas" class="roulette-canvas" width="250" height="250"></canvas>
         <button class="spin-button" id="spinButton" onclick="spinRoulette()">Крутить</button>
     </div>
     <div class="slots-container hidden" id="slotsGame">
@@ -457,7 +342,7 @@
     </div>
     <div class="modal" id="inventoryModal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeInventory()">&times;</span>
+            <span class="close-button" onclick="closeInventory()">×</span>
             <h2>Инвентарь</h2>
             <table class="inventory-table" id="inventoryTable">
                 <thead>
@@ -489,10 +374,138 @@
             { name: 'Банкротство', value: -1000, icon: 'https://img.icons8.com/color/24/bankruptcy.png', addToInventory: false },
             { name: 'Полено', value: 0, icon: 'https://img.icons8.com/color/24/wood.png', addToInventory: true },
             { name: 'Автомат', value: 0, icon: 'https://img.icons8.com/color/24/automatic.png', addToInventory: true },
-            { name: 'Игрушка Попи Плей Тайм', value: 0, icon: 'https://img.icons8.com/color/24/huggy-wuggy.png', addToInventory: true },
+            { name: 'Хаги Ваги', value: 0, icon: 'https://img.icons8.com/color/24/huggy-wuggy.png', addToInventory: true },
             { name: 'Сова', value: 0, icon: 'https://img.icons8.com/color/24/owl.png', addToInventory: true }
         ];
         let inventory = {};
+
+        const canvas = document.getElementById('rouletteCanvas');
+        const ctx = canvas.getContext('2d');
+        const radius = canvas.width / 2;
+        let rotation = 0;
+        let spinning = false;
+        let spinSpeed = 0;
+        let targetRotation = 0;
+        const colors = [
+            '#ffd700', '#ffcc00', '#00ffcc', '#ff4d4d', '#ffaa00',
+            '#990000', '#8b4513', '#666666', '#ff69b4', '#4b0082'
+        ];
+
+        function drawRoulette() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(radius, radius);
+            ctx.rotate(rotation);
+
+            // Рисуем сектора
+            for (let i = 0; i < roulettePrizes.length; i++) {
+                const angle = (i * 2 * Math.PI) / roulettePrizes.length;
+                const nextAngle = ((i + 1) * 2 * Math.PI) / roulettePrizes.length;
+
+                // Сектор
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, angle, nextAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+                ctx.strokeStyle = '#1a2236';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Тень для объёма
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, angle, nextAngle);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.globalCompositeOperation = 'multiply';
+                ctx.fill();
+                ctx.globalCompositeOperation = 'source-over';
+
+                // Текст
+                ctx.save();
+                ctx.rotate(angle + Math.PI / roulettePrizes.length);
+                ctx.translate(radius * 0.6, 0);
+                ctx.rotate(Math.PI / 2);
+                ctx.font = '12px Arial';
+                ctx.fillStyle = '#1a2236';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(roulettePrizes[i].name, 0, 0);
+                ctx.restore();
+            }
+
+            ctx.restore();
+
+            // Рисуем стрелку
+            ctx.beginPath();
+            ctx.moveTo(radius - 6, 0);
+            ctx.lineTo(radius + 6, 0);
+            ctx.lineTo(radius, 30);
+            ctx.closePath();
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#1a2236';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function spinRoulette() {
+            if (!gameActive || currentGame !== 'roulette' || spinning) return;
+            gameActive = false;
+            spinning = true;
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = true;
+
+            const randomPrizeIndex = Math.floor(Math.random() * roulettePrizes.length);
+            const prize = roulettePrizes[randomPrizeIndex];
+            const sectorAngle = (2 * Math.PI) / roulettePrizes.length;
+            const centerAngle = randomPrizeIndex * sectorAngle + sectorAngle / 2;
+            const fullSpins = 3 * 2 * Math.PI; // 3 полных оборота
+            targetRotation = fullSpins + centerAngle - (rotation % (2 * Math.PI));
+            spinSpeed = 0.3; // Начальная скорость вращения
+
+            animateSpin(prize, spinButton);
+        }
+
+        function animateSpin(prize, spinButton) {
+            rotation += spinSpeed;
+            spinSpeed *= 0.98; // Экспоненциальное затухание
+
+            drawRoulette();
+
+            if (spinSpeed > 0.001 && Math.abs(rotation - targetRotation) > 0.01) {
+                requestAnimationFrame(() => animateSpin(prize, spinButton));
+            } else {
+                rotation = targetRotation;
+                drawRoulette();
+                spinning = false;
+
+                const message = document.getElementById('message');
+                const playAgainButton = document.getElementById('playAgain');
+                if (prize.name === 'Банкротство') {
+                    balance = Math.max(0, balance + prize.value);
+                    document.getElementById('balance').textContent = balance;
+                    message.textContent = 'Мистер Бист запрещает вам депать, в качестве штрафа он заберёт у вас 1000 звёзд';
+                } else if (prize.name === 'Кот в мешке') {
+                    message.textContent = 'Тебе не повезло, попробуй ещё раз';
+                } else {
+                    if (prize.value > 0) {
+                        balance += prize.value;
+                        document.getElementById('balance').textContent = balance;
+                    }
+                    if (prize.addToInventory) {
+                        inventory[prize.name] = (inventory[prize.name] || 0) + 1;
+                    }
+                    message.textContent = `Поздравляем! Ты выиграл ${prize.name}!`;
+                    message.classList.add('winner');
+                }
+                spinButton.disabled = false;
+                playAgainButton.style.display = 'block';
+                gameActive = true;
+            }
+        }
 
         function startGame(game) {
             document.getElementById('menu').classList.add('hidden');
@@ -505,6 +518,7 @@
                 document.getElementById('chestsGame').classList.remove('hidden');
             } else if (game === 'roulette') {
                 document.getElementById('rouletteGame').classList.remove('hidden');
+                drawRoulette();
             } else if (game === 'slots') {
                 document.getElementById('slotsGame').classList.remove('hidden');
             }
@@ -535,43 +549,6 @@
             });
 
             playAgainButton.style.display = 'block';
-        }
-
-        function spinRoulette() {
-            if (!gameActive || currentGame !== 'roulette') return;
-            gameActive = false;
-            const wheel = document.getElementById('wheel');
-            const message = document.getElementById('message');
-            const playAgainButton = document.getElementById('playAgain');
-            const spinButton = document.getElementById('spinButton');
-
-            spinButton.disabled = true;
-            wheel.classList.add('spin');
-            const randomPrizeIndex = Math.floor(Math.random() * roulettePrizes.length);
-            const prize = roulettePrizes[randomPrizeIndex];
-
-            setTimeout(() => {
-                wheel.classList.remove('spin');
-                if (prize.name === 'Банкротство') {
-                    balance = Math.max(0, balance + prize.value);
-                    document.getElementById('balance').textContent = balance;
-                    message.textContent = 'Мистер Бист запрещает вам депать, в качестве штрафа он заберёт у вас 1000 звёзд';
-                } else if (prize.name === 'Кот в мешке') {
-                    message.textContent = 'Тебе не повезло, попробуй ещё раз';
-                } else {
-                    if (prize.value > 0) {
-                        balance += prize.value;
-                        document.getElementById('balance').textContent = balance;
-                    }
-                    if (prize.addToInventory) {
-                        inventory[prize.name] = (inventory[prize.name] || 0) + 1;
-                    }
-                    message.textContent = `Поздравляем! Ты выиграл ${prize.name}!`;
-                    message.classList.add('winner');
-                }
-                spinButton.disabled = false;
-                playAgainButton.style.display = 'block';
-            }, 3000);
         }
 
         function spinSlots() {
@@ -632,6 +609,9 @@
                 });
             } else if (currentGame === 'roulette') {
                 if (spinButton) spinButton.disabled = false;
+                spinning = false;
+                rotation = 0;
+                drawRoulette();
             } else if (currentGame === 'slots') {
                 if (slotSpinButton) slotSpinButton.disabled = false;
                 const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
@@ -679,6 +659,9 @@
         function closeInventory() {
             document.getElementById('inventoryModal').style.display = 'none';
         }
+
+        // Инициализация рулетки
+        drawRoulette();
     </script>
 </body>
 </html>
