@@ -129,6 +129,36 @@
         .roulette-label:nth-child(1) { transform: rotate(60deg) translateY(-80px); }
         .roulette-label:nth-child(2) { transform: rotate(180deg) translateY(-80px); }
         .roulette-label:nth-child(3) { transform: rotate(300deg) translateY(-80px); }
+        .slots-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 300px;
+        }
+        .slots-reels {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .reel {
+            width: 80px;
+            height: 80px;
+            background-color: #2a3b5b;
+            border: 2px solid #00aaff;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .reel img {
+            width: 64px;
+            height: 64px;
+        }
+        .reel.spin {
+            animation: slotSpin 1s ease-in-out;
+        }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -143,6 +173,11 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(1080deg); }
         }
+        @keyframes slotSpin {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-100px); }
+            100% { transform: translateY(0); }
+        }
         .message {
             font-size: 1.2em;
             margin-top: 20px;
@@ -152,7 +187,7 @@
         .message.winner {
             color: #ffd700;
         }
-        .play-again, .back-button, .spin-button {
+        .play-again, .back-button, .spin-button, .slot-spin-button {
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 1.2em;
@@ -163,7 +198,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .play-again:hover, .back-button:hover, .spin-button:hover {
+        .play-again:hover, .back-button:hover, .spin-button:hover, .slot-spin-button:hover {
             background-color: #007bff;
             transform: scale(1.05);
         }
@@ -208,10 +243,18 @@
             .roulette-label:nth-child(1) { transform: rotate(60deg) translateY(-60px); }
             .roulette-label:nth-child(2) { transform: rotate(180deg) translateY(-60px); }
             .roulette-label:nth-child(3) { transform: rotate(300deg) translateY(-60px); }
+            .reel {
+                width: 60px;
+                height: 60px;
+            }
+            .reel img {
+                width: 48px;
+                height: 48px;
+            }
             .message {
                 font-size: 1em;
             }
-            .play-again, .back-button, .spin-button {
+            .play-again, .back-button, .spin-button, .slot-spin-button {
                 font-size: 1em;
                 padding: 8px 16px;
             }
@@ -228,7 +271,7 @@
         <div class="menu-item" onclick="startGame('chests')">
             <img src="https://img.icons8.com/color/64/treasure-chest.png" alt="Сундуки">
         </div>
-        <div class="menu-item">
+        <div class="menu-item" onclick="startGame('slots')">
             <img src="https://img.icons8.com/color/64/slot-machine.png" alt="Слоты">
         </div>
         <div class="menu-item" onclick="startGame('roulette')">
@@ -257,6 +300,20 @@
         </div>
         <button class="spin-button" id="spinButton" onclick="spinRoulette()">Крутить</button>
     </div>
+    <div class="slots-container hidden" id="slotsGame">
+        <div class="slots-reels">
+            <div class="reel" id="reel1">
+                <img src="https://img.icons8.com/color/64/star--v1.png" alt="Звезда">
+            </div>
+            <div class="reel" id="reel2">
+                <img src="https://img.icons8.com/color/64/star--v1.png" alt="Звезда">
+            </div>
+            <div class="reel" id="reel3">
+                <img src="https://img.icons8.com/color/64/star--v1.png" alt="Звезда">
+            </div>
+        </div>
+        <button class="slot-spin-button" id="slotSpinButton" onclick="spinSlots()">Крутить</button>
+    </div>
     <div class="message" id="message"></div>
     <div class="game-buttons">
         <button class="play-again" id="playAgain" onclick="resetGame()">Играть снова</button>
@@ -267,22 +324,30 @@
         let gameActive = true;
         let winningChest = Math.floor(Math.random() * 3);
         let currentGame = '';
-        const prizes = [
+        const roulettePrizes = [
             { name: '100 звёздочек', value: 100 },
             { name: 'Пусто', value: 0 },
             { name: '50 звёздочек', value: 50 }
+        ];
+        const slotSymbols = [
+            { name: 'Звезда', icon: 'https://img.icons8.com/color/64/star--v1.png' },
+            { name: 'Монета', icon: 'https://img.icons8.com/color/64/coins.png' },
+            { name: 'Алмаз', icon: 'https://img.icons8.com/color/64/diamond.png' }
         ];
 
         function startGame(game) {
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('welcome').classList.add('hidden');
             document.getElementById('backButton').classList.remove('hidden');
+            document.getElementById('chestsGame').classList.add('hidden');
+            document.getElementById('rouletteGame').classList.add('hidden');
+            document.getElementById('slotsGame').classList.add('hidden');
             if (game === 'chests') {
                 document.getElementById('chestsGame').classList.remove('hidden');
-                document.getElementById('rouletteGame').classList.add('hidden');
             } else if (game === 'roulette') {
                 document.getElementById('rouletteGame').classList.remove('hidden');
-                document.getElementById('chestsGame').classList.add('hidden');
+            } else if (game === 'slots') {
+                document.getElementById('slotsGame').classList.remove('hidden');
             }
             currentGame = game;
             resetGame();
@@ -323,8 +388,8 @@
 
             spinButton.disabled = true;
             wheel.classList.add('spin');
-            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
-            const prize = prizes[randomPrizeIndex];
+            const randomPrizeIndex = Math.floor(Math.random() * roulettePrizes.length);
+            const prize = roulettePrizes[randomPrizeIndex];
 
             setTimeout(() => {
                 wheel.classList.remove('spin');
@@ -341,12 +406,56 @@
             }, 3000);
         }
 
+        function spinSlots() {
+            if (!gameActive || currentGame !== 'slots') return;
+            gameActive = false;
+            const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+            const message = document.getElementById('message');
+            const playAgainButton = document.getElementById('playAgain');
+            const slotSpinButton = document.getElementById('slotSpinButton');
+
+            slotSpinButton.disabled = true;
+            reels.forEach(reel => reel.classList.add('spin'));
+
+            const results = [
+                Math.floor(Math.random() * slotSymbols.length),
+                Math.floor(Math.random() * slotSymbols.length),
+                Math.floor(Math.random() * slotSymbols.length)
+            ];
+
+            setTimeout(() => {
+                reels.forEach((reel, i) => {
+                    reel.classList.remove('spin');
+                    reel.querySelector('img').src = slotSymbols[results[i]].icon;
+                    reel.querySelector('img').alt = slotSymbols[results[i]].name;
+                });
+
+                if (results[0] === results[1] && results[1] === results[2]) {
+                    balance += 100;
+                    document.getElementById('balance').textContent = balance;
+                    message.textContent = `Поздравляем! Три ${slotSymbols[results[0]].name}! Ты выиграл 100 звёздочек!`;
+                    message.classList.add('winner');
+                } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+                    balance += 50;
+                    document.getElementById('balance').textContent = balance;
+                    message.textContent = `Поздравляем! Два одинаковых символа! Ты выиграл 50 звёздочек!`;
+                    message.classList.add('winner');
+                } else {
+                    message.textContent = 'Тебе не повезло, попробуй ещё раз';
+                }
+
+                slotSpinButton.disabled = false;
+                playAgainButton.style.display = 'block';
+            }, 1000);
+        }
+
         function resetGame() {
             gameActive = true;
             const chests = document.querySelectorAll('.chest');
             const message = document.getElementById('message');
             const playAgainButton = document.getElementById('playAgain');
             const spinButton = document.getElementById('spinButton');
+            const slotSpinButton = document.getElementById('slotSpinButton');
 
             if (currentGame === 'chests') {
                 winningChest = Math.floor(Math.random() * 3);
@@ -355,15 +464,25 @@
                 });
             } else if (currentGame === 'roulette') {
                 if (spinButton) spinButton.disabled = false;
+            } else if (currentGame === 'slots') {
+                if (slotSpinButton) slotSpinButton.disabled = false;
+                const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+                reels.forEach(reel => {
+                    reel.classList.remove('spin');
+                    reel.querySelector('img').src = 'https://img.icons8.com/color/64/star--v1.png';
+                    reel.querySelector('img').alt = 'Звезда';
+                });
             }
 
             message.textContent = '';
             message.classList.remove('winner');
             playAgainButton.style.display = 'none';
         }
+
         function backToMenu() {
             document.getElementById('chestsGame').classList.add('hidden');
             document.getElementById('rouletteGame').classList.add('hidden');
+            document.getElementById('slotsGame').classList.add('hidden');
             document.getElementById('menu').classList.remove('hidden');
             document.getElementById('welcome').classList.remove('hidden');
             document.getElementById('backButton').classList.add('hidden');
