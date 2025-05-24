@@ -186,6 +186,25 @@
             height: 24px;
             vertical-align: middle;
         }
+        .win-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            animation: fadeInOut 1s ease-in-out;
+        }
+        .win-overlay-text {
+            font-size: 3em;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00aaff, 0 0 20px #00aaff;
+            text-align: center;
+        }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -200,6 +219,12 @@
             0% { transform: translateY(0); }
             50% { transform: translateY(-100px); }
             100% { transform: translateY(0); }
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
         }
         .message {
             font-size: 1.2em;
@@ -283,6 +308,9 @@
                 width: 20px;
                 height: 20px;
             }
+            .win-overlay-text {
+                font-size: 2em;
+            }
         }
     </style>
 </head>
@@ -355,6 +383,9 @@
             </table>
         </div>
     </div>
+    <div class="win-overlay" id="winOverlay">
+        <div class="win-overlay-text" id="winOverlayText"></div>
+    </div>
     <script>
         let balance = 1000;
         let gameActive = true;
@@ -387,8 +418,8 @@
         let spinSpeed = 0;
         let targetRotation = 0;
         const colors = [
-            '#ffd700', '#ffcc00', '#00ffcc', '#ff4d4d', '#ffaa00',
-            '#990000', '#8b4513', '#666666', '#ff69b4', '#4b0082'
+            '#FFD700', '#FF4D4D', '#00A1FF', '#00FF66', '#FF69B4',
+            '#FFAA00', '#990000', '#00CCCC', '#FF1493', '#32CD32'
         ];
 
         function drawRoulette() {
@@ -423,12 +454,12 @@
                 ctx.fill();
                 ctx.globalCompositeOperation = 'source-over';
 
-                // Текст
+                // Текст по вертикали
                 ctx.save();
                 ctx.rotate(angle + Math.PI / roulettePrizes.length);
-                ctx.translate(radius * 0.6, 0);
-                ctx.rotate(Math.PI / 2);
-                ctx.font = '12px Arial';
+                ctx.translate(radius * 0.5, 0);
+                ctx.rotate(-Math.PI / 2); // Поворот на 90° против часовой для вертикального текста
+                ctx.font = '14px Arial';
                 ctx.fillStyle = '#1a2236';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -438,13 +469,13 @@
 
             ctx.restore();
 
-            // Рисуем стрелку
+            // Рисуем голубую стрелку
             ctx.beginPath();
-            ctx.moveTo(radius - 6, 0);
-            ctx.lineTo(radius + 6, 0);
+            ctx.moveTo(radius - 10, 0);
+            ctx.lineTo(radius + 10, 0);
             ctx.lineTo(radius, 30);
             ctx.closePath();
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = '#00A1FF';
             ctx.fill();
             ctx.strokeStyle = '#1a2236';
             ctx.lineWidth = 2;
@@ -462,16 +493,16 @@
             const prize = roulettePrizes[randomPrizeIndex];
             const sectorAngle = (2 * Math.PI) / roulettePrizes.length;
             const centerAngle = randomPrizeIndex * sectorAngle + sectorAngle / 2;
-            const fullSpins = 3 * 2 * Math.PI; // 3 полных оборота
+            const fullSpins = 3 * 2 * Math.PI;
             targetRotation = fullSpins + centerAngle - (rotation % (2 * Math.PI));
-            spinSpeed = 0.3; // Начальная скорость вращения
+            spinSpeed = 0.3;
 
             animateSpin(prize, spinButton);
         }
 
         function animateSpin(prize, spinButton) {
             rotation += spinSpeed;
-            spinSpeed *= 0.98; // Экспоненциальное затухание
+            spinSpeed *= 0.98;
 
             drawRoulette();
 
@@ -482,28 +513,38 @@
                 drawRoulette();
                 spinning = false;
 
-                const message = document.getElementById('message');
-                const playAgainButton = document.getElementById('playAgain');
-                if (prize.name === 'Банкротство') {
-                    balance = Math.max(0, balance + prize.value);
-                    document.getElementById('balance').textContent = balance;
-                    message.textContent = 'Мистер Бист запрещает вам депать, в качестве штрафа он заберёт у вас 1000 звёзд';
-                } else if (prize.name === 'Кот в мешке') {
-                    message.textContent = 'Тебе не повезло, попробуй ещё раз';
-                } else {
-                    if (prize.value > 0) {
-                        balance += prize.value;
+                // Показываем оверлей с призом
+                const winOverlay = document.getElementById('winOverlay');
+                const winOverlayText = document.getElementById('winOverlayText');
+                winOverlayText.textContent = `Вы выиграли: ${prize.name}!`;
+                winOverlay.style.display = 'flex';
+
+                setTimeout(() => {
+                    winOverlay.style.display = 'none';
+
+                    const message = document.getElementById('message');
+                    const playAgainButton = document.getElementById('playAgain');
+                    if (prize.name === 'Банкротство') {
+                        balance = Math.max(0, balance + prize.value);
                         document.getElementById('balance').textContent = balance;
+                        message.textContent = 'Мистер Бист запрещает вам депать, в качестве штрафа он заберёт у вас 1000 звёзд';
+                    } else if (prize.name === 'Кот в мешке') {
+                        message.textContent = 'Тебе не повезло, попробуй ещё раз';
+                    } else {
+                        if (prize.value > 0) {
+                            balance += prize.value;
+                            document.getElementById('balance').textContent = balance;
+                        }
+                        if (prize.addToInventory) {
+                            inventory[prize.name] = (inventory[prize.name] || 0) + 1;
+                        }
+                        message.textContent = `Поздравляем! Ты выиграл ${prize.name}!`;
+                        message.classList.add('winner');
                     }
-                    if (prize.addToInventory) {
-                        inventory[prize.name] = (inventory[prize.name] || 0) + 1;
-                    }
-                    message.textContent = `Поздравляем! Ты выиграл ${prize.name}!`;
-                    message.classList.add('winner');
-                }
-                spinButton.disabled = false;
-                playAgainButton.style.display = 'block';
-                gameActive = true;
+                    spinButton.disabled = false;
+                    playAgainButton.style.display = 'block';
+                    gameActive = true;
+                }, 1000);
             }
         }
 
