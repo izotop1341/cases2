@@ -137,6 +137,41 @@
         .reel.spin {
             animation: slotSpin 1s ease-in-out;
         }
+        .bombs-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 300px;
+        }
+        .bombs-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            grid-gap: 5px;
+            margin-bottom: 20px;
+        }
+        .bomb-cell {
+            width: 50px;
+            height: 50px;
+            background-color: #2a3b5b;
+            border: 2px solid #00aaff;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .bomb-cell img {
+            width: 32px;
+            height: 32px;
+        }
+        .bomb-cell.selected {
+            background-color: #ffd700;
+        }
+        .bomb-cell.revealed {
+            cursor: default;
+        }
         .modal {
             display: none;
             position: fixed;
@@ -235,7 +270,7 @@
         .message.winner {
             color: #ffd700;
         }
-        .play-again, .back-button, .spin-button, .slot-spin-button {
+        .play-again, .back-button, .spin-button, .slot-spin-button, .check-button {
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 1.2em;
@@ -246,7 +281,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .play-again:hover, .back-button:hover, .spin-button:hover, .slot-spin-button:hover {
+        .play-again:hover, .back-button:hover, .spin-button:hover, .slot-spin-button:hover, .check-button:hover {
             background-color: #007bff;
             transform: scale(1.05);
         }
@@ -291,10 +326,18 @@
                 width: 48px;
                 height: 48px;
             }
+            .bomb-cell {
+                width: 40px;
+                height: 40px;
+            }
+            .bomb-cell img {
+                width: 24px;
+                height: 24px;
+            }
             .message {
                 font-size: 1em;
             }
-            .play-again, .back-button, .spin-button, .slot-spin-button {
+            .play-again, .back-button, .spin-button, .slot-spin-button, .check-button {
                 font-size: 1em;
                 padding: 8px 16px;
             }
@@ -333,6 +376,9 @@
         <div class="menu-item" onclick="startGame('roulette')">
             <img src="https://img.icons8.com/color/64/roulette.png" alt="Рулетка">
         </div>
+        <div class="menu-item" onclick="startGame('bombs')">
+            <img src="https://img.icons8.com/color/64/bomb.png" alt="Бомбы">
+        </div>
     </div>
     <div class="game-container hidden" id="chestsGame">
         <div class="chest" onclick="openChest(0)">
@@ -362,6 +408,10 @@
             </div>
         </div>
         <button class="slot-spin-button" id="slotSpinButton" onclick="spinSlots()">Крутить</button>
+    </div>
+    <div class="bombs-container hidden" id="bombsGame">
+        <div class="bombs-grid" id="bombsGrid"></div>
+        <button class="check-button" id="checkButton" onclick="checkBombs()" disabled>Проверить</button>
     </div>
     <div class="message" id="message"></div>
     <div class="game-buttons">
@@ -410,6 +460,12 @@
         ];
         let inventory = {};
 
+        let bombsField = [];
+        let selectedCells = [];
+        const bombsCount = 13; // Изменено с 10 на 13
+        const starsCount = 12; // Добавлено 12 звёзд
+        const gridSize = 5;
+
         const canvas = document.getElementById('rouletteCanvas');
         const ctx = canvas.getContext('2d');
         const radius = canvas.width / 2;
@@ -428,12 +484,10 @@
             ctx.translate(radius, radius);
             ctx.rotate(rotation);
 
-            // Рисуем сектора
             for (let i = 0; i < roulettePrizes.length; i++) {
                 const angle = (i * 2 * Math.PI) / roulettePrizes.length;
                 const nextAngle = ((i + 1) * 2 * Math.PI) / roulettePrizes.length;
 
-                // Сектор
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
                 ctx.arc(0, 0, radius, angle, nextAngle);
@@ -444,7 +498,6 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Тень для объёма
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
                 ctx.arc(0, 0, radius, angle, nextAngle);
@@ -454,11 +507,10 @@
                 ctx.fill();
                 ctx.globalCompositeOperation = 'source-over';
 
-                // Текст по вертикали
                 ctx.save();
                 ctx.rotate(angle + Math.PI / roulettePrizes.length);
                 ctx.translate(radius * 0.5, 0);
-                ctx.rotate(-Math.PI / 2); // Поворот на 90° против часовой для вертикального текста
+                ctx.rotate(-Math.PI / 2);
                 ctx.font = '14px Arial';
                 ctx.fillStyle = '#1a2236';
                 ctx.textAlign = 'center';
@@ -469,7 +521,6 @@
 
             ctx.restore();
 
-            // Рисуем голубую стрелку
             ctx.beginPath();
             ctx.moveTo(radius - 10, 0);
             ctx.lineTo(radius + 10, 0);
@@ -513,7 +564,6 @@
                 drawRoulette();
                 spinning = false;
 
-                // Показываем оверлей с призом
                 const winOverlay = document.getElementById('winOverlay');
                 const winOverlayText = document.getElementById('winOverlayText');
                 winOverlayText.textContent = `Вы выиграли: ${prize.name}!`;
@@ -548,6 +598,116 @@
             }
         }
 
+        function initializeBombsGame() {
+            const bombsGrid = document.getElementById('bombsGrid');
+            bombsGrid.innerHTML = '';
+            bombsField = [];
+            selectedCells = [];
+
+            // Создаём поле 5×5
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('bomb-cell');
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.innerHTML = `<img src="https://img.icons8.com/color/32/star--v1.png" alt="Звезда">`;
+                    cell.addEventListener('click', toggleCellSelection);
+                    bombsGrid.appendChild(cell);
+                }
+            }
+
+            // Случайно размещаем 13 бомб и 12 звёзд
+            let bombPositions = new Set();
+            while (bombPositions.size < bombsCount) {
+                const pos = Math.floor(Math.random() * (gridSize * gridSize));
+                bombPositions.add(pos);
+            }
+
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                bombsField[i] = bombPositions.has(i) ? 'bomb' : 'star';
+            }
+
+            document.getElementById('checkButton').disabled = true;
+        }
+
+        function toggleCellSelection(event) {
+            if (!gameActive || currentGame !== 'bombs') return;
+            const cell = event.currentTarget;
+            if (cell.classList.contains('revealed')) return;
+
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            const index = row * gridSize + col;
+
+            if (cell.classList.contains('selected')) {
+                cell.classList.remove('selected');
+                cell.innerHTML = `<img src="https://img.icons8.com/color/32/star--v1.png" alt="Звезда">`;
+                selectedCells = selectedCells.filter(cellIndex => cellIndex !== index);
+            } else {
+                if (selectedCells.length < 5) {
+                    cell.classList.add('selected');
+                    cell.innerHTML = `<img src="https://img.icons8.com/color/32/ffff00/star--v1.png" alt="Звезда">`; // Жёлтая звезда
+                    selectedCells.push(index);
+                }
+            }
+
+            const checkButton = document.getElementById('checkButton');
+            checkButton.disabled = selectedCells.length === 0;
+        }
+
+        function checkBombs() {
+            if (!gameActive || currentGame !== 'bombs') return;
+            gameActive = false;
+
+            const bombsGrid = document.getElementById('bombsGrid');
+            const cells = bombsGrid.querySelectorAll('.bomb-cell');
+            let correctGuesses = 0;
+
+            cells.forEach((cell, index) => {
+                cell.classList.add('revealed');
+                cell.classList.remove('selected');
+                if (bombsField[index] === 'bomb') {
+                    cell.innerHTML = `<img src="https://img.icons8.com/color/32/bomb.png" alt="Бомба">`;
+                } else if (selectedCells.includes(index)) {
+                    correctGuesses++;
+                }
+            });
+
+            let reward = 0;
+            let messageText = '';
+            if (correctGuesses === 0) {
+                reward = -100;
+                messageText = 'Ты не угадал ни одной звезды! Потеряно 100 звёзд.';
+            } else if (correctGuesses === 1) {
+                reward = 10;
+                messageText = 'Поздравляем! Ты угадал 1 звезду и получил 10 звёзд!';
+            } else if (correctGuesses === 2) {
+                reward = 20;
+                messageText = 'Поздравляем! Ты угадал 2 звезды и получил 20 звёзд!';
+            } else if (correctGuesses === 3) {
+                reward = 30;
+                messageText = 'Поздравляем! Ты угадал 3 звезды и получил 30 звёзд!';
+            } else if (correctGuesses === 4) {
+                reward = 40;
+                messageText = 'Поздравляем! Ты угадал 4 звезды и получил 40 звёзд!';
+            } else if (correctGuesses === 5) {
+                reward = 100;
+                messageText = 'Поздравляем! Ты угадал 5 звёзд и получил 100 звёзд!';
+            }
+
+            balance += reward;
+            document.getElementById('balance').textContent = balance;
+
+            const message = document.getElementById('message');
+            message.textContent = messageText;
+            if (correctGuesses > 0) {
+                message.classList.add('winner');
+            }
+
+            document.getElementById('playAgain').style.display = 'block';
+        }
+
         function startGame(game) {
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('welcome').classList.add('hidden');
@@ -555,6 +715,7 @@
             document.getElementById('chestsGame').classList.add('hidden');
             document.getElementById('rouletteGame').classList.add('hidden');
             document.getElementById('slotsGame').classList.add('hidden');
+            document.getElementById('bombsGame').classList.add('hidden');
             if (game === 'chests') {
                 document.getElementById('chestsGame').classList.remove('hidden');
             } else if (game === 'roulette') {
@@ -562,6 +723,9 @@
                 drawRoulette();
             } else if (game === 'slots') {
                 document.getElementById('slotsGame').classList.remove('hidden');
+            } else if (game === 'bombs') {
+                document.getElementById('bombsGame').classList.remove('hidden');
+                initializeBombsGame();
             }
             currentGame = game;
             resetGame();
@@ -661,6 +825,8 @@
                     reel.querySelector('img').src = 'https://img.icons8.com/color/64/star--v1.png';
                     reel.querySelector('img').alt = 'Звезда';
                 });
+            } else if (currentGame === 'bombs') {
+                initializeBombsGame();
             }
 
             message.textContent = '';
@@ -672,6 +838,7 @@
             document.getElementById('chestsGame').classList.add('hidden');
             document.getElementById('rouletteGame').classList.add('hidden');
             document.getElementById('slotsGame').classList.add('hidden');
+            document.getElementById('bombsGame').classList.add('hidden');
             document.getElementById('menu').classList.remove('hidden');
             document.getElementById('welcome').classList.remove('hidden');
             document.getElementById('backButton').classList.add('hidden');
@@ -701,7 +868,6 @@
             document.getElementById('inventoryModal').style.display = 'none';
         }
 
-        // Инициализация рулетки
         drawRoulette();
     </script>
 </body>
