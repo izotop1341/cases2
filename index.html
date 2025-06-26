@@ -1,61 +1,248 @@
-from flask import Flask, render_template, jsonify, request
-import random
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# Mock user data for testing
-user_data = {
-    "user_id": 12345,
-    "neon_coins": 1000,
-    "username": "TestPlayer"
-}
-
 @app.route('/')
-def index():
-    return render_template('index.html', user=user_data)
-
-@app.route('/api/spin_slots', methods=['POST'])
-def spin_slots():
-    bet = request.json.get('bet', 10)
-    if user_data['neon_coins'] < bet:
-        return jsonify({"error": "Not enough NeonCoins"}), 400
-    
-    # Slot machine logic: 3 reels, each with 3 possible outcomes
-    reels = [random.choice(['🍒', '💎', '7️⃣']) for _ in range(3)]
-    user_data['neon_coins'] -= bet
-    
-    # Win conditions
-    if reels[0] == reels[1] == reels[2]:
-        multiplier = 10 if reels[0] == '7️⃣' else 5
-        winnings = bet * multiplier
-        user_data['neon_coins'] += winnings
-        return jsonify({"reels": reels, "neon_coins": user_data['neon_coins'], "winnings": winnings})
-    
-    return jsonify({"reels": reels, "neon_coins": user_data['neon_coins'], "winnings": 0})
-
-@app.route('/api/roll_dice', methods=['POST'])
-def roll_dice():
-    bet = request.json.get('bet', 10)
-    prediction = request.json.get('prediction', 7)  # Sum of two dice
-    if user_data['neon_coins'] < bet:
-        return jsonify({"error": "Not enough NeonCoins"}), 400
-    
-    # Roll two dice
-    dice = [random.randint(1, 6), random.randint(1, 6)]
-    total = sum(dice)
-    user_data['neon_coins'] -= bet
-    
-    # Win if predicted sum matches
-    if total == prediction:
-        winnings = bet * 5
-        user_data['neon_coins'] += winnings
-        return jsonify({"dice": dice, "total": total, "neon_coins": user_data['neon_coins'], "winnings": winnings})
-    
-    return jsonify({"dice": dice, "total": total, "neon_coins": user_data['neon_coins'], "winnings": 0})
-
-@app.route('/api/user')
-def get_user():
-    return jsonify(user_data)
+def dashboard():
+    # In a real app, fetch user data from Telegram Web App API
+    user = {
+        'username': 'Player',  # Placeholder, replace with Telegram API data
+        'balance': 1000       # Placeholder balance
+    }
+    return render_template('dashboard.html', user=user)
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Spin - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <header class="logo">
+            <h1>Star Spin</h1>
+        </header>
+
+        <!-- Promo Banner -->
+        <section class="promo-banner">
+            <div class="banner">
+                <p>Welcome to Star Spin! Get 100 Free Spins Now!</p>
+                <!-- Placeholder for carousel -->
+            </div>
+        </section>
+
+        <!-- Action Buttons -->
+        <section class="actions">
+            <button class="action-btn play-btn">Play Now</button>
+            <div class="secondary-actions">
+                <button class="action-btn wallet-btn">
+                    Wallet: {{ user.balance }} Tokens
+                </button>
+                <button class="action-btn bonus-btn">Bonuses</button>
+                <button class="action-btn profile-btn">{{ user.username }}</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- ¬¬<!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="/" class="nav-item active">
+            <span class="material-icons">home</span>
+            <span>Home</span>
+        </a>
+        <a href="/games" class="nav-item">
+            <span class="material-icons">casino</span>
+            <span>Games</span>
+        </a>
+        <a href="/wallet" class="nav-item">
+            <span class="material-icons">account_balance_wallet</span>
+            <span>Wallet</span>
+        </a>
+        <a href="/profile" class="nav-item">
+            <span class="material-icons">person</span>
+            <span>Profile</span>
+        </a>
+        <a href="/support" class="nav-item">
+            <span class="material-icons">support_agent</span>
+            <span>Support</span>
+        </a>
+    </nav>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Logo */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo h1 {
+    font-size: 2.5rem;
+    color: #00FF88;
+    text-shadow: 0 0 10px #00FF88, 0 0 20px #AA00FF;
+    animation: neon 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes neon {
+    from {
+        text-shadow: 0 0 5px #00FF88, 0 0 10px #AA00FF;
+    }
+    to {
+        text-shadow: 0 0 10px #00FF88, 0 0 20px #AA00FF;
+    }
+}
+
+/* Promo Banner */
+.promo-banner {
+    background: linear-gradient(45deg, #AA00FF, #00FF88);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    animation: slide 0.5s ease-out;
+}
+
+.promo-banner p {
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+/* Action Buttons */
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.action-btn {
+    width: 100%;
+    max-width: 300px;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.play-btn {
+    background: linear-gradient(45deg, #FFD700, #FFAA00);
+    color: #121212;
+}
+
+.wallet-btn {
+    background: linear-gradient(45deg, #00FF88, #00CC66);
+}
+
+.bonus-btn {
+    background: linear-gradient(45deg, #AA00FF, #7700AA);
+}
+
+.profile-btn {
+    background: linear-gradient(45deg, #FF5555, #CC3333);
+}
+
+.secondary-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 600px;
+    background: rgba(18, 18, 18, 0.9);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #333;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.nav-item.active {
+    color: #00FF88;
+}
+
+.nav-item span.material-icons {
+    font-size: 24px;
+}
+
+@keyframes slide {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 400px) {
+    .logo h1 {
+        font-size: 2rem;
+    }
+
+    .action-btn {
+        font-size: 1rem;
+        padding: 12px;
+    }
+
+    .secondary-actions {
+        grid-template-columns: 1fr;
+    }
+}
